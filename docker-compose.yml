@@ -8,18 +8,26 @@ services:
       - .:/var/www/html
     depends_on:
       - db
-    env_file:
-      - .env
+    environment:
+      DB_HOST: db
+      DB_NAME: ${MARIADB_DATABASE}
+      DB_USER: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
 
   db:
     image: mariadb:11
     container_name: trackflow_db
     restart: always
-    env_file:
-      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MARIADB_DATABASE}
+      MYSQL_USER: ${MARIADB_USER}
+      MYSQL_PASSWORD: ${MARIADB_PASSWORD}
+    ports:
+      - "127.0.0.1:3306:3306"
     volumes:
       - db_data:/var/lib/mysql
       - ./sql:/docker-entrypoint-initdb.d
 
 volumes:
-  db_data: 
+  db_data:
