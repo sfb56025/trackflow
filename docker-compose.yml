@@ -1,33 +1,34 @@
+version: '3.8'
+
 services:
-  web:
-    build: ./docker
-    container_name: trackflow_web
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     ports:
       - "8080:80"
     volumes:
       - .:/var/www/html
+    environment:
+      - DB_HOST=db
+      - DB_NAME=trackflow
+      - DB_USER=trackflow_user
+      - DB_PASSWORD=secret
     depends_on:
       - db
-    environment:
-      DB_HOST: db
-      DB_NAME: ${MARIADB_DATABASE}
-      DB_USER: ${MARIADB_USER}
-      DB_PASSWORD: ${MARIADB_PASSWORD}
 
   db:
-    image: mariadb:11
-    container_name: trackflow_db
-    restart: always
+    image: mariadb:10.6
     environment:
-      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MARIADB_DATABASE}
-      MYSQL_USER: ${MARIADB_USER}
-      MYSQL_PASSWORD: ${MARIADB_PASSWORD}
-    ports:
-      - "127.0.0.1:3306:3306"
+      MYSQL_ROOT_PASSWORD: rootsecret
+      MYSQL_DATABASE: trackflow
+      MYSQL_USER: trackflow_user
+      MYSQL_PASSWORD: secret
     volumes:
       - db_data:/var/lib/mysql
-      - ./sql:/docker-entrypoint-initdb.d
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
 
 volumes:
   db_data:
